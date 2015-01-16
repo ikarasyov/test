@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<title>Add a New Quiz Question</title>
+<!-- test -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<style type="text/css">
+<!--
+body {
+	background-color: #eee;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 12px;
+}
+fieldset {
+	margin: 0 0 5px 0;
+	padding: 0 10px;
+	border: 1px solid #ccc;
+}
+legend {
+	color: #666;
+}
+input[type=text], textarea {
+	width: 250px;
+	margin: 0;
+	padding: 5px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	border: 1px solid #999;
+}
+.fixed_width {
+	float: left;
+	width: 70px;
+	padding: 5px;
+	text-align: right;
+}
+.required {
+	color: red;
+}
+.des_quiz ol {
+	/*list-style: none;
+	margin: 0;
+	padding: 0;*/
+}
+.des_quiz li {
+	padding: 5px 10px;
+}
+.des_quiz label {
+	display: block;
+	margin-left: 20px;
+}
+.des_quiz input[type=checkbox] {
+	float: left;
+}
+-->
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script language="JavaScript1.2" type="text/javascript">
+<!--
+function validateForm() {
+	var e, err, i, correct;
+	e = document.forms[0].elements;
+	err = [];
+	correct = 0;
+	if (e["question"].value == "") err.push("Please enter a question");
+	if (e["a1"].value == "" || e["a2"].value == "") err.push("Please enter at least two answers");
+	for (i = 0; i < 5; i++) {
+		if (e["c" + (i + 1)].checked) ++correct;
+		console.log(e["c" + (i + 1)].checked);
+	}
+	if (correct == 0) err.push("Please select at least one correct answer");
+	if (!err.length) {
+		insertQuestion();
+		return false;
+	} else {
+		alert(err.join("\n"));
+		return false;
+	}
+}
+function insertQuestion(){
+	var e, html, count, answers, tmpstr, id;
+	e = document.forms[0].elements;
+	html = [];
+	count = 1;
+	answers = [];
+	html.push("<div class=\"des_quiz\"><p>");
+	if (e["number"].value > "") html.push(e["number"].value + ". ");
+	html.push(e["question"].value + "</p><ol type=\"a\">");
+	for(i=0;i<e.length;i++){
+		if(e[i].name && e[i].name.match(/^a\d+$/) && e[i].value>""){
+			id = "q" + e["number"].value + "-\a" + count + "";
+			html.push("<li><input name=\"" + id + "\" id=\"" + id + "\" type=\"checkbox\" value=\"0\"/>");
+			html.push(" <label for=\"" + id + "\">" + e[i].value + "</label></li>");
+			if(e["c"+count] && e["c"+count].checked){
+				answers[count-1] = 1;
+			}else{
+				answers[count-1] = 0;
+			}
+			count++;
+		}
+	}
+	html.push("</ol><p><input type=\"button\" name=\"verify\" value=\"Verify Answer\"onClick=\"IK_verifyAnswer_v3(event");
+	
+	tmpstr = e["answeryes"].value > "" ? e["answeryes"].value : "Yes, that's correct";
+	tmpstr = tmpstr.replace(/'/g,"\\\'");
+	tmpstr = tmpstr.replace(/"/g,"");
+	html.push(",'" + tmpstr + "'");
+
+	tmpstr = e["answerno"].value > "" ? e["answerno"].value : "No, that is not correct";
+	tmpstr = tmpstr.replace(/'/g,"\\\'");
+	tmpstr = tmpstr.replace(/"/g,"");
+	html.push(",'"+tmpstr+"'");
+
+	html.push(",[" + answers.toString() + "]");
+	
+	html.push(");\"/>&nbsp;<input type=\"reset\" name=\"reset\" value=\"Uncheck All\"/></p></div>");
+	//CloseDlg(html.join(""));
+	$("#form2").append(html.join(""));
+}
+function IK_verifyAnswer_v3(e,msgyes,msgno,answers){
+	var $quiz, checkbox, i;
+	$quiz = $(e.target).parents("div");
+	for(i = 0; i < answers.length; i++){
+		checkbox = $quiz.find("input:checkbox:eq(" + i + ")");
+		if(answers[i] != checkbox.is(":checked")) {
+			alert(msgno);
+			return;
+		}
+	}
+	alert(msgyes);
+	return;
+}
+
+//-->
+</script>
+</head>
+
+<body>
+<form action="" method="post" onsubmit="return validateForm();">
+	<fieldset>
+		<legend>Question</legend>
+		<p>Number field is optional. If omitted a question would appear without number.</p>
+		<p>
+			<label for="number" class="fixed_width">Number:</label>
+			<input name="number" id="number" type="text" value="" />
+		</p>
+		<p>
+			<label for="question" class="fixed_width">Question:<span class="required">*</span></label>
+			<textarea name="question" id="question" rows="2"></textarea>
+		</p>
+	</fieldset>
+	<fieldset>
+		<legend>Answers</legend>
+		<p>
+			<label for="a1" class="fixed_width">a.<span class="required">*</span></label>
+			<input type="text" name="a1" id="a1" value="" />
+			<input type="checkbox" name="c1" id="c1" value="correct" />
+			<label for="c1">Correct</label>
+		</p>
+		<p>
+			<label for="a2" class="fixed_width">b.<span class="required">*</span></label>
+			<input type="text" name="a2" id="a2" value="" />
+			<input type="checkbox" name="c2" id="c2" value="correct" />
+			<label for="c2">Correct</label>
+		</p>
+		<p>
+			<label for="a3" class="fixed_width">c.</label>
+			<input type="text" name="a3" id="a3" value="" />
+			<input type="checkbox" name="c3" id="c3" value="correct" />
+			<label for="c3">Correct</label>
+		</p>
+		<p>
+			<label for="a4" class="fixed_width">d.</label>
+			<input type="text" name="a4" id="a4" value="" />
+			<input type="checkbox" name="c4" id="c4" value="correct" />
+			<label for="c4">Correct</label>
+		</p>
+		<p>
+			<label for="a5" class="fixed_width">e.</label>
+			<input type="text" name="a5" id="a5" value="" />
+			<input type="checkbox" name="c5" id="c5" value="correct" />
+			<label for="c5">Correct</label>
+		</p>
+	</fieldset>
+	<fieldset>
+		<legend>Feedback</legend>
+		<p>
+			<label for="answeryes" class="fixed_width">Correct:</label>
+			<textarea name="answeryes" rows="2" id="answeryes">Yes, that's correct.</textarea>
+		</p>
+		<p>
+			<label for="answerno" class="fixed_width">Incorrect:</label>
+			<textarea name="answerno" rows="2" id="answerno">No, that's incorrect.</textarea>
+		</p>
+	</fieldset>
+	<p>
+		<input type="submit" name="Submit" value="Insert Question" />
+		&nbsp;
+		<input type="button" name="cancel" value="Cancel" onclick="CloseDlg();" />
+	</p>
+</form>
+<form id="form2">
+
+</form>
+</body>
+</html>
